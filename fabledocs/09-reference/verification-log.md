@@ -37,6 +37,20 @@ implementation + tests written and run):
 - Commands: no *new* command executions on this date; statuses in the
   [cheatsheet](command-cheatsheet.md) carry over from 2026-07-30 where marked verified.
 
+## 2026-10-06 — drift check (no commands that need `node_modules`)
+
+- The code has moved past v1.0: `src/JobTracker.jsx` is 830 lines, and `src/App.jsx`,
+  `src/calendar/CalendarHome.jsx`, `src/dates.js`, `src/theme.js`, and `src/jobBackup.js` exist.
+  An anchor remap and status update for R2, R7, R8, J11, M2, M6, and M8 is in
+  [the curriculum README](../README.md).
+- Test count by source: 7 test files, 84 `it` blocks, two `it.each` tables (4 and 6 rows), so
+  92 reported cases. `npm test` was not re-run (no install in this pass).
+- Executed with plain Node (pure ES modules, no dependencies): `parseISO('2026-02-31')` returns
+  `null` (R8 fixed); `parseJobBackup` rejects a `javascript:` URL with the message
+  "URL must be an absolute http or https URL."
+- The single-`storage.set` claim above no longer holds: `persist` (L477) and backup import via
+  `commitJobBackup` (L503, `src/jobBackup.js:62`) both write, on the same queue.
+
 ## Uncertainties and open items
 
 - `npm run preview`, `test:watch`, `-t` name filtering, coverage: **inferred** from

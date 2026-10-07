@@ -14,7 +14,7 @@ compatible storage provider. The original product brief is in [`SPEC.md`](./SPEC
 ```bash
 npm install
 npm run dev      # http://localhost:5173
-npm test         # 78 tests, Vitest + Testing Library
+npm test         # 92 test cases in 7 files, Vitest + Testing Library
 npm run build    # production bundle in dist/
 ```
 

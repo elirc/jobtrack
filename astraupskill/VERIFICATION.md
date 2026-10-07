@@ -10,7 +10,9 @@
 | build | Passed (exit code 0) |
 | Real Chromium browser interaction | Passed |
 
-**Automated test cases:** 6 in `test/jobBackup.test.js` (two of them parameterized over 4 and 6 inputs) - 4 delivered by this change, plus 2 added in the 2026-09-17 follow-up covering the two bounds that were previously asserted only by inspection. The project's inherited Vitest suite is 90 cases across 8 files; it was re-run as a regression gate, not authored here.
+**Automated test cases:** 6 in `test/jobBackup.test.js` (two of them parameterized over 4 and 6 inputs) - 4 delivered by this change, plus 2 added in the 2026-09-17 follow-up covering the two bounds that were previously asserted only by inspection. The project's inherited Vitest suite is 90 cases across 8 files; it was re-run as a regression gate, not authored here. (Recount from source on 2026-10-06: 7 test files plus `test/setup.js`, 84 `it` blocks, 92 cases once the two `it.each` tables expand. The suite was not re-run in that pass.)
+
+Re-checked on 2026-10-06 with plain Node, no install: `parseJobBackup` rejects a `javascript:` URL, but with the message "URL must be an absolute http or https URL." rather than the "must use http or https" message on `src/jobBackup.js:46`, because that `fail()` runs inside the `try` whose `catch` replaces it. Chapter 3, variation 3 now teaches this.
 
 ## What was exercised
 

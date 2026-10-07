@@ -14,6 +14,17 @@ triggering condition doesn't, yet. Hypothesis = plausible, not fully traced.
 | R7 | Save-error flag is global, not per-write — under interleaving, a stale success could clear a newer failure's bar | [L498](../../src/JobTracker.jsx#L498), [L534-L536](../../src/JobTracker.jsx#L534-L536) | Low (misleading UI) | ~0 today (needs R2's preconditions) | Same harness as R2's test | Falls out of [M6](../06-contribution-practice/02-mid-level-feature-tickets.md)/[K3](../06-contribution-practice/04-refactor-and-design-katas.md) | Hypothesis (interleaving not traced exhaustively) |
 | R8 | `parseISO` accepts calendar-invalid dates via JS Date rollover (`"2026-02-31"` → Mar 3) — record renders with a date the user never entered | [L89-L94](../../src/JobTracker.jsx#L89-L94); reachable only via hand-edited storage or future import (the date input prevents it in UI) | Low | ~0 via UI | Unit test after [J11](../06-contribution-practice/01-good-first-tickets.md) exports helpers | Reject when re-serialized parts ≠ input | Confirmed (behavior), Low impact |
 
+### Status update, 2026-10-06
+
+Anchors in the table are v1.0 lines; see the remap in [the curriculum README](../README.md).
+
+- **R2:** partly closed. `persist` now serializes writes on `writeQueue` (`src/JobTracker.jsx:474-477`), so writes cannot land out of order. Handlers still compute `next` from the render-time `apps` (L564, L566, L575).
+- **R3:** still latent at L566. Import keeps file ids and rejects duplicates inside one file (`src/jobBackup.js:31-33`), so import does not trigger it.
+- **R4:** the backup file now has an envelope (`format`, `version`), but the stored value is still a bare array (`src/jobBackup.js:62`, `src/JobTracker.jsx:477`).
+- **R7:** closed by the same serialization; an older write's result is always handled before a newer one starts.
+- **R8:** fixed in `src/dates.js:23-40`.
+- **R9 (new, hypothesis):** `src/App.jsx:56` unmounts `JobTracker` when the user switches to the calendar; a remount reloads from storage while the old instance's queued write may still be pending on a slow asynchronous host.
+
 ## Non-risks worth recording (things that look scary and aren't)
 
 - `dangerouslySetInnerHTML` at [L605](../../src/JobTracker.jsx#L605): constant-fed;

@@ -20,7 +20,7 @@ recommendation — [ticket J14](../06-contribution-practice/01-good-first-ticket
 | `npm run dev` | Vite dev server, HMR, http://localhost:5173 | __verified__ |
 | `npm run build` | Production bundle → `dist/` (~158 kB js, ~51 kB gzip) | __verified__ |
 | `npm run preview` | Serve the built `dist/` locally | __inferred__ |
-| `npm test` | `vitest run` — single pass, 27 tests | __verified__ |
+| `npm test` | `vitest run` — single pass; 27 tests at v1.0, 92 cases in 7 files today (counted from source 2026-10-06) | __verified__ (v1.0) |
 | `npm run test:watch` | Vitest watch mode | __inferred__ (watch flag read from config, not run to completion) |
 | `npx vitest run test/storage.test.js` | One file only | __verified__ |
 

@@ -9,6 +9,58 @@
 > [ticket M8](06-contribution-practice/02-mid-level-feature-tickets.md)'s premise has changed:
 > its extraction condition has genuinely occurred, and the `theme.js` extraction has happened.
 
+### Anchor remap and status update (verified against the code on 2026-10-06)
+
+Most `JobTracker.jsx#L...` links in this curriculum point at the 779-line v1.0 file. Use this
+table to translate the most-cited ones; the symbol names did not change.
+
+| v1.0 anchor (as cited) | What it pointed at | Current location in `src/JobTracker.jsx` (830 lines) |
+|---|---|---|
+| L6-L12 | header doc comment (`window.storage` contract) | L6-L18 |
+| L35-L82 | injected CSS string | moved to `src/theme.js:24` (`CSS`), injected by `src/App.jsx:35` |
+| L141-L379 | style objects `S` | L61-L303 |
+| L496-L505 | `useState` declarations | L433-L447 (now includes `importing`, `backupMessage`, `writeQueue`) |
+| L508-L527 | load-once effect | L450-L470 |
+| L512 / L515 | `storage.get` / `JSON.parse` | L454 / L456 |
+| L517-L519 | catch that conflates first run and corrupt JSON | L459-L462 |
+| L530-L538 | `persist` | L472-L480 |
+| L533 | the `storage.set` call | L477, now chained onto `writeQueue.current` |
+| L541 | `setField` | L515 |
+| L553-L556 | `startEdit` field guards | L525-L544 |
+| L568-L582 | `submit` | L546-L569 |
+| L577 / L579 | edit / create `persist` calls (`Date.now().toString(36)` id) | L564 / L566 |
+| L584-L589 | `remove` | L571-L576 |
+| L592-L598 | derived data (`sorted`, `filtered`, `noted`) | L579-L591 |
+| L595-L596 | sort comparators | L581-L583 |
+| L598 | `noted` projection | L591 (`filtered.filter(hasNotes)`) |
+| L602-L778 | render tree | L598-L829 |
+| L672-L676 | save-error bar | L701-L705 |
+| L89-L94 | `parseISO` | `src/dates.js:23-40` |
+
+What changed in substance (check each claim with the cited line before relying on the older text):
+
+- **Tests:** 7 test files with 84 `it` blocks; two `it.each` tables in `test/jobBackup.test.js`
+  expand to 4 and 6 cases, so Vitest reports 92 (counted from source; `test/setup.js` holds no
+  tests). Every "27 tests" in these pages describes v1.0.
+- **Writes are serialized.** `persist` chains onto `writeQueue.current` (L447, L474-L477), which
+  is ticket M6 implemented. R2's out-of-order half and R7 (stale success masking a newer failure)
+  are therefore closed; R2's stale-closure half remains, because handlers still build `next`
+  from the render-time `apps` (L564, L566, L575).
+- **There are now two write paths,** not one. Backup import (L494-L512) calls
+  `commitJobBackup(window.storage, text)` (`src/jobBackup.js:60-64`) on the same queue and then
+  calls `setApps` directly, bypassing `persist`. Pages that teach "every mutation goes through
+  `persist`" describe v1.0. Ticket M2 (export/import) is implemented this way; the
+  `astraupskill/` folder walks through it.
+- **R8 is fixed:** `parseISO` (`src/dates.js:23-40`) now returns `null` for `2026-02-31`
+  (check: `node --input-type=module -e "import {parseISO} from './src/dates.js'; console.log(parseISO('2026-02-31'))"` prints `null`).
+  Ticket J11 is done too: `dates.js` exports its helpers and `test/dates.test.js` covers them.
+- **New latent risk:** `src/App.jsx:56` renders `section === "calendar" ? <CalendarHome /> : <JobTracker />`,
+  so switching sections unmounts the tracker and the remount runs the load effect again. The
+  write queue lives in the old instance's `useRef` (L447). With the synchronous `localStorage`
+  shim the write lands first, but with a slow asynchronous host the new instance could read the
+  value from before a still-pending write. Treat this as a hypothesis to test with a fake storage
+  whose `set` resolves on demand.
+
 A training lab built on this repository for one learner: a **junior fullstack engineer**
 (CRUD web dev — .NET/C#, React/Node/TS or similar) who wants to reach mid-level fast,
 build senior judgment, and pass interviews for mid-level fullstack roles.
@@ -26,7 +78,7 @@ components, no router, no state library, no backend, no auth. One component
 ([JobTracker.jsx](../src/JobTracker.jsx)) owns all state, styling, and persistence. Data is
 one JSON array under one key in an async key-value store (`window.storage`), shimmed over
 `localStorage` by [storage.js](../src/storage.js). Vite builds it; Vitest + Testing Library
-verify 27 behaviors. It was built to a written spec ([SPEC.md](../SPEC.md)) — rare in open
+verified 27 behaviors at v1.0 (92 test cases across 7 files on 2026-10-06; see the remap above). It was built to a written spec ([SPEC.md](../SPEC.md)) — rare in open
 source and gold for learning: you can diff *intent* against *implementation*.
 
 Don't mistake small for trivial. This repo contains, in miniature, the exact ideas

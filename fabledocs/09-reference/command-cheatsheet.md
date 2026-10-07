@@ -12,7 +12,7 @@ __inferred__ = read from config, not executed.
 | Dev on a specific port | `npx vite --port 5174 --strictPort` | __verified__ (5173) |
 | Production build | `npm run build` → `dist/` | __verified__ (~158 kB js) |
 | Preview the build | `npm run preview` | __inferred__ |
-| All tests once | `npm test` | __verified__ (27 passing) |
+| All tests once | `npm test` | __verified__ at v1.0 (27 passing); 92 cases in 7 files today, counted from source 2026-10-06 |
 | Watch mode | `npm run test:watch` | __inferred__ |
 | One test file | `npx vitest run test/storage.test.js` | __verified__ |
 | Tests matching a name | `npx vitest run -t "sorts A–Z"` | __inferred__ |
